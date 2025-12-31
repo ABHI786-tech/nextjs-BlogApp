@@ -3,6 +3,8 @@ import React from "react";
 import Link from "next/link";
 import { app } from "../app/lib/auth";
 import { getDatabase, ref, set } from "firebase/database"
+import Searchbar from "./components/searchbar"
+
 
 const db = getDatabase(app)
 
@@ -40,11 +42,14 @@ export default function Home() {
     },
   ];
 
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className= "bg-blue-600 text-white py-16">
-        <div className="max-w-4xl mx-auto text-center px-4">
+      {/* <section className= "bg-blue-600 text-white py-16"> */}
+      {/* <section className= "min-h-screen bg-[var(--primary-color)] text-white py-16"> */}
+      <section className= "min-h-screen flex items-center justify-center bg-linear-to-r from-red-900 via-red-800 to-red-900 text-white text-center px-6 rounded-b-4xl">  
+        <div className="flex-col max-w-4xl mx-auto text-center px-4">
           <h2 className="text-4xl font-bold mb-4">Welcome to MyBlog</h2>
           <p className="text-lg opacity-90">
             Learn Web Development, Firebase, Next.js and more 🚀
@@ -54,10 +59,14 @@ export default function Home() {
 
       {/* Blog Posts */}
       <section className="max-w-6xl mx-auto px-4 py-12">
+<div >
+<Searchbar />
+</div>
+
         <h3 className="text-2xl font-semibold mb-6">Latest Posts</h3>
 
-         <button onClick={putData}
-              className="rounded bg-blue-600 px-4 py-2 text-white">PUT DATA</button>
+         {/* <button onClick={putData}
+              className="rounded bg-blue-600 px-4 py-2 text-white">PUT DATA</button> */}
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {posts.map((post) => (
@@ -72,7 +81,7 @@ export default function Home() {
               </div>
               <Link
                 href={`/blog/${post.id}`}
-                className="text-blue-600 font-medium hover:underline"
+                className="text-red-700 font-medium hover:underline"
               >
                 Read More →
               </Link>
@@ -81,12 +90,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 py-6 mt-12">
-        <div className="max-w-6xl mx-auto text-center text-sm">
-          © 2025 MyBlog. All rights reserved.
-        </div>
-      </footer>
+      
     </div>
   );
 }

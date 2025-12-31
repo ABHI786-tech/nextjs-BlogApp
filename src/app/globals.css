@@ -1,2 +1,12 @@
 @import "tailwindcss";
 
+:root {
+  --primary-color:  rgb(40, 0, 0, 1);
+  --text-colorr:  rgb(197, 0, 26);
+  --secondary-color: rgb(118, 54, 38);
+  --bg-color:  rgb(144, 175, 197);
+  --text-color:  rgb(42, 49, 50);
+  /* --nav-color: rgb(51, 0, 0); */
+  --nav-color: rgb(57, 62, 63) ;
+  
+}
