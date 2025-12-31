@@ -4,7 +4,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../../lib/fireStore";
+import { auth } from "../../lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
