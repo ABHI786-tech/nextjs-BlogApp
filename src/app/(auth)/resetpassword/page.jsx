@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { confirmPasswordReset } from "firebase/auth";
-import { auth } from "../../lib/auth";
+import { auth } from "../../lib/fireStore";
 import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ResetPassword() {

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../lib/auth";
+import { auth } from "../../lib/fireStore";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
