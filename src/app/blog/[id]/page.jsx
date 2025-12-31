@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { db } from "../../lib/firestore"; // 👈 Firestore config
+import { db } from "../../lib/fireStore"; // 👈 Firestore config
 import Link from "next/link";
 
 const PostsPage = () => {

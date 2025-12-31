@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { app } from "../app/lib/auth";
+import { app } from "./lib/fireStore";
 import { getDatabase, ref, set } from "firebase/database"
 import Searchbar from "./components/searchbar"
 
