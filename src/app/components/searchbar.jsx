@@ -2,7 +2,7 @@ import React from 'react'
 
 const Searchbar = () => {
   return (
-  <div className="mb-6">
+  <div className="mb-6 w-[75%]">
     <input
       type="text"
       placeholder="Search posts..."
