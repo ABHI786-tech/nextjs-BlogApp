@@ -5,7 +5,7 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-5">
       {/* Hero Section */}
-      <section className="bg-red-900 text-white py-20">
+      <section className="bg-red-900/90 text-white py-20">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
             About Our Blog
@@ -74,7 +74,7 @@ const About = () => {
           </p>
           <a
             href="/blogs"
-            className="inline-block bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+            className="inline-block bg-[var(--button-color)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-800 transition"
           >
             Explore Blogs
           </a>

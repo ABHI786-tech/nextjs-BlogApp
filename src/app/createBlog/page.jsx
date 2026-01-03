@@ -125,7 +125,7 @@ export default function CreatePost() {
         <button
           type="submit"
           disabled={submitting}
-          className="bg-red-700 text-white px-6 py-3 rounded-lg hover:bg-red-800 disabled:opacity-50"
+          className="bg-[var(--button-color)] text-white px-6 py-3 rounded-lg hover:bg-red-800 disabled:opacity-50"
         >
           {submitting ? "Creating..." : "Create Blog"}
         </button>

@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { app } from "./lib/auth";
 import Searchbar from "./components/searchbar";
-import { CldImage } from "next-cloudinary";
 
 import {
   getFirestore,
@@ -56,7 +55,7 @@ export default function Home() {
 
           <Link
             href="/createBlog"
-            className="rounded-lg bg-red-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-800"
+            className="rounded-lg bg-[var(--button-color)] px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
           >
             + Create Blog
           </Link>

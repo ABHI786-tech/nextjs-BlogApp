@@ -128,7 +128,7 @@ export default function BlogDetails() {
               />
               <button
                 onClick={handleComment}
-                className="bg-red-700 text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
+                className="bg-[var(--button-color)] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition"
               >
                 Post Comment
               </button>

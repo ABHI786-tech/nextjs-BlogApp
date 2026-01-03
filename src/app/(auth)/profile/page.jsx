@@ -155,7 +155,7 @@ export default function ProfilePage() {
                 <button
                     onClick={handleUpdateProfile}
                     disabled={loading}
-                    className="mt-4 w-full bg-red-700 text-white py-2.5 rounded-lg font-semibold hover:bg-red-800 transition disabled:opacity-60"
+                    className="mt-4 w-full bg-[var(--button-color)] text-white py-2.5 rounded-lg font-semibold hover:bg-red-800 transition disabled:opacity-60"
                 >
                     {loading ? "Updating..." : "Edit Profile"}
                 </button>

@@ -100,7 +100,7 @@ export default function Header() {
             <li className="relative" ref={profileRef}>
               <button
                 onClick={() => setOpenProfile(!openProfile)}
-                className="h-9 w-9 rounded-full bg-red-700 text-white flex items-center justify-center font-semibold"
+                className="h-9 w-9 rounded-full bg-[var(--button-color)] text-white flex items-center justify-center font-semibold"
               >
                 {userInitial}
               </button>
@@ -168,7 +168,7 @@ export default function Header() {
                 onClick={() => setOpenProfile(!openProfile)}
                 className="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-full"
               >
-                <div className="h-8 w-8 rounded-full bg-red-700 flex items-center justify-center text-white font-semibold">
+                <div className="h-8 w-8 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
                   {userInitial}
                 </div>
               
