@@ -5,23 +5,29 @@ import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../lib/auth";
+import { getAvatarColor } from "../lib/avtarColor"; // ✅ added
 
 export default function Header() {
+  const pathname = usePathname();
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [openProfile, setOpenProfile] = useState(false);
-  const pathname = usePathname();
-  const profileRef = useRef(null);
+  const [openDesktopProfile, setOpenDesktopProfile] = useState(false);
+  const [openMobileProfile, setOpenMobileProfile] = useState(false);
+
+  const desktopProfileRef = useRef(null);
+  const mobileProfileRef = useRef(null);
 
   const navItems = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },
+    { name: "Blogs", href: "/allblogs" },
     { name: "My Blogs", href: "/myblogs" },
     { name: "Login", href: "/login" },
     { name: "Register", href: "/register" },
   ];
 
-  // 🔐 Firebase auth listener
+  // 🔐 Firebase Auth
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -29,47 +35,60 @@ export default function Header() {
     return () => unsubscribe();
   }, []);
 
-  // ❌ Close dropdown on outside click
+  // ❌ Outside Click Close
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setOpenProfile(false);
+      if (
+        desktopProfileRef.current &&
+        !desktopProfileRef.current.contains(e.target)
+      ) {
+        setOpenDesktopProfile(false);
+      }
+
+      if (
+        mobileProfileRef.current &&
+        !mobileProfileRef.current.contains(e.target)
+      ) {
+        setOpenMobileProfile(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
   // 🚪 Logout
   const handleLogout = async () => {
     await signOut(auth);
-    setOpenProfile(false);
+    setOpenDesktopProfile(false);
+    setOpenMobileProfile(false);
     setIsMobileMenuOpen(false);
   };
 
-  // 🔤 First letter logic
+  // 🔤 User Initial
   const userInitial =
-    user?.displayName
-      ? user.displayName.charAt(0).toUpperCase()
-      : user?.email
-        ? user.email.charAt(0).toUpperCase()
-        : "";
+    user?.displayName?.charAt(0).toUpperCase() ||
+    user?.email?.charAt(0).toUpperCase() ||
+    "";
 
-  // 🔁 Filter nav
+  // 🎨 SAME avatar color as Profile Page
+  const avatarColor = user ? getAvatarColor(user.email) : "bg-gray-500";
+
+  // 🔁 Filter Nav Items
   const filteredNavItems = navItems.filter((item) =>
     user ? item.name !== "Login" && item.name !== "Register" : true
   );
 
   return (
-    <nav className="fixed top-3 left-5 right-5 bg-gray-400/50 backdrop-blur-lg shadow-lg rounded-4xl px-6 z-50">
-      <div className="max-w-screen mx-auto px-4 py-4 flex items-center justify-between">
+    <nav className="fixed top-3 left-5 right-5 z-50 bg-gray-400/50 backdrop-blur-lg rounded-4xl shadow-lg">
+      <div className="max-w-screen mx-auto px-6 py-4 flex items-center justify-between">
 
         {/* 🔵 Logo */}
-        <Link href="/" className="text-2xl font-bold tracking-wide">
+        <Link href="/" className="text-2xl font-bold">
           BLOG <span className="text-red-500">APP</span>
         </Link>
 
-        {/* 📱 Mobile toggle */}
+        {/* 📱 Mobile Toggle */}
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           className="lg:hidden"
@@ -79,57 +98,51 @@ export default function Header() {
           </svg>
         </button>
 
-        {/* 🖥️ Desktop Menu */}
+        {/* 🖥 Desktop Menu */}
         <ul className="hidden lg:flex items-center gap-8 font-medium">
-          {filteredNavItems.map((item, i) => (
-            <li key={i}>
+          {filteredNavItems.map((item) => (
+            <li key={item.name}>
               <Link
                 href={item.href}
-                className={`${pathname === item.href
-                  ? "text-white font-semibold"
-                  : "hover:text-gray-300"
-                  }`}
+                className={`${
+                  pathname === item.href
+                    ? "text-white font-semibold"
+                    : "hover:text-gray-300"
+                }`}
               >
                 {item.name}
               </Link>
             </li>
           ))}
 
-          {/* 👤 Profile dropdown */}
+          {/* 👤 Desktop Profile */}
           {user && (
-            <li className="relative" ref={profileRef}>
+            <li className="relative" ref={desktopProfileRef}>
               <button
-                onClick={() => setOpenProfile(!openProfile)}
-                className="h-9 w-9 rounded-full bg-[var(--button-color)] text-white flex items-center justify-center font-semibold"
+                onClick={() => setOpenDesktopProfile(!openDesktopProfile)}
+                className={`h-9 w-9 rounded-full flex items-center justify-center 
+                text-white font-semibold ${avatarColor}`}
               >
                 {userInitial}
               </button>
 
-              {openProfile && (
-                <div className="absolute right-0 mt-3 w-48 rounded-md bg-gray-800 shadow-lg z-50">
-                  <div className="px-4 py-2 text-sm text-gray-400 border-b border-white/10">
+              {openDesktopProfile && (
+                <div className="absolute right-0 mt-3 w-48 rounded-md text-white bg-gray-800 shadow-lg">
+                  <div className="px-4 py-2 text-sm border-b">
                     {user.email}
                   </div>
 
                   <Link
                     href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5"
-                    onClick={() => setOpenProfile(false)}
+                    onClick={() => setOpenDesktopProfile(false)}
+                    className="block px-4 py-2 text-sm hover:bg-white/5"
                   >
                     Your Profile
                   </Link>
 
-                  <Link
-                    href="/settings"
-                    className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5"
-                    onClick={() => setOpenProfile(false)}
-                  >
-                    Settings
-                  </Link>
-
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/5"
                   >
                     Sign out
                   </button>
@@ -140,72 +153,52 @@ export default function Header() {
         </ul>
       </div>
 
-      {/* 📱 Mobile Menu */}
-
-
+      {/* 📱 Mobile Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-72 bg-gray-800 rounded-2xl text-white transform transition-transform duration-300 ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-[120%]"
-          } lg:hidden`}
+        className={`fixed top-0 left-0 h-full w-72 bg-gray-800 rounded-2xl text-white transform transition-transform duration-300 lg:hidden ${
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-[120%]"
+        }`}
       >
-
-        <div className="flex items-center justify-between bg-gray-800  rounded-2xl p-4 border-b">
-          <Link href="/" className="text-2xl font-bold">
+        <div className="p-4 border-b flex justify-between bg-gray-900 rounded-2xl items-center">
+          <Link href="/" className="text-xl font-bold">
             BLOG <span className="text-red-500">APP</span>
           </Link>
-
-
-          <button onClick={() => setIsMobileMenuOpen(false)}>
-            ✕
-          </button>
-
+          <button onClick={() => setIsMobileMenuOpen(false)}>✕</button>
         </div>
 
-
-        <ul className="flex flex-col gap-6 p-6 text-lg bg-gray-800 rounded-2xl">
+        <ul className="flex flex-col gap-6 p-6 bg-gray-900 rounded-2xl">
           {user && (
-            <div className="relative lg:hidden flex items-center gap-2" ref={profileRef}>
+            <li ref={mobileProfileRef}>
               <button
-                onClick={() => setOpenProfile(!openProfile)}
-                className="flex items-center gap-2 bg-gray-800 px-3 py-1.5 rounded-full"
+                onClick={() => setOpenMobileProfile(!openMobileProfile)}
+                className="flex items-center gap-3"
               >
-                <div className="h-8 w-8 rounded-full bg-red-600 flex items-center justify-center text-white font-semibold">
+                <div
+                  className={`h-8 w-8 rounded-full flex items-center 
+                  justify-center font-semibold text-white ${avatarColor}`}
+                >
                   {userInitial}
                 </div>
-              
-              <span>
-                    <div className="px-4 py-2 text-md text-gray-400 border-b border-white/10 truncate">
-                      {user.email}
-                    </div>
-                {openProfile && (
-                  <div className="absolute right-0 top-12 w-48 rounded-md bg-gray-800 shadow-lg z-50">
-
-                    <Link
-                      href="/profile"
-                      onClick={() => {
-                        setOpenProfile(false);
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="block px-4 py-2 text-sm text-gray-300 hover:bg-white/5"
-                    >
-                      Your Profile
-                    </Link>
-                  </div>
-                )}
-              </span>
+                <span className="truncate text-sm">{user.email}</span>
               </button>
-            </div>
+
+              {openMobileProfile && (
+                <Link
+                  href="/profile"
+                  onClick={() => {
+                    setOpenMobileProfile(false);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="block mt-3 pl-11 text-sm hover:text-gray-300"
+                >
+                  Your Profile
+                </Link>
+              )}
+            </li>
           )}
 
-          {/* <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
-                  >
-                    Sign out
-                  </button> */}
-
-
-          {filteredNavItems.map((item, i) => (
-            <li key={i}>
+          {filteredNavItems.map((item) => (
+            <li key={item.name}>
               <Link
                 href={item.href}
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -227,7 +220,7 @@ export default function Header() {
             </li>
           )}
         </ul>
-      </div >
-    </nav >
+      </div>
+    </nav>
   );
 }

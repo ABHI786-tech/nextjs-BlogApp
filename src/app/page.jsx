@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { app } from "./lib/auth";
-import Searchbar from "./components/searchbar";
+import { Search } from "lucide-react"
 
 import {
   getFirestore,
@@ -13,9 +13,10 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-
 export default function Home() {
   const [posts, setPosts] = useState([]);
+  const [search, setSearch] = useState("");
+
   const db = getFirestore(app);
 
   useEffect(() => {
@@ -35,27 +36,40 @@ export default function Home() {
     return () => unsubscribe();
   }, [db]);
 
+  // ✅ SEARCH FILTER 
+  const filteredPosts = posts.filter((post) =>
+    post.title?.toLowerCase().includes(search.toLowerCase()) ||
+    post.content?.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="min-h-screen flex items-center justify-center bg-linear-to-r from-red-900 via-red-800 to-red-900 text-white text-center px-6">
-        <div className="max-w-4xl mx-auto">
+        <div>
           <h2 className="text-4xl font-bold mb-4">Welcome to MyBlog</h2>
-          <p className="text-lg opacity-90">
-            Learn Web Development, Firebase, Next.js and more 🚀
-          </p>
+          <p>Learn Web Development, Firebase, Next.js and more 🚀</p>
         </div>
       </section>
 
-      {/* Blog Posts */}
+      {/* Blogs */}
       <section className="max-w-6xl mx-auto px-4 py-12">
-        {/* Search + Create */}
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Searchbar />
+        {/* 🔍 SEARCH + CREATE */}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:justify-between">
+          <span className="flex gap-x-1">
+            <input
+              type="text"
+              placeholder="Search blog..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full sm:w-72 rounded-lg border px-4 py-2"
+            />
+            <button className="bg-[var(--button-color)] text-white px-5 py-2.5 rounded-lg"><Search size={16} className="text-white inline-block mx-1" />search</button>
+          </span>
 
           <Link
             href="/createBlog"
-            className="rounded-lg bg-[var(--button-color)] px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700"
+            className="rounded-lg bg-red-700 px-5 py-2.5 text-white"
           >
             + Create Blog
           </Link>
@@ -63,47 +77,34 @@ export default function Home() {
 
         <h3 className="text-2xl font-semibold mb-6">Latest Posts</h3>
 
-        {posts.length === 0 ? (
-          <p className="text-gray-500">No posts available</p>
+        {filteredPosts.length === 0 ? (
+          <p className="text-gray-500">No posts found</p>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
+          <div 
+          className="grid gap-6 md:grid-cols-2 lg:grid-cols-3" >
+            {filteredPosts.map((post) => (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden"
+                className="my-2 p-5 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative"
               >
-                {/* Blog Image */}
-                {/* {post.image && (
-                  <CldImage
-                    src={post.image}
-                    width={600}
-                    height={350}
-                    crop="fill"
-                    alt={post.title}
-                  />
-                  
-                )} */}
+                <h4 className="text-xl font-semibold mb-2">
+                  {post.title}
+                </h4>
 
-                <div className="p-5">
-                  <h4 className="text-xl font-semibold mb-2">
-                    {post.title}
-                  </h4>
+                <p className="text-gray-600 mb-4 line-clamp-3">
+                  {post.content}
+                </p>
 
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {post.content}
-                  </p>
+                <p className="text-sm text-gray-500 mb-3">
+                  By {post.author?.email}
+                </p>
 
-                  <div className="text-sm text-gray-500 mb-3">
-                    By {post.author?.email}
-                  </div>
-
-                  <Link
-                    href={`/blog/${post.id}`}
-                    className="text-red-700 font-medium hover:underline"
-                  >
-                    Read More →
-                  </Link>
-                </div>
+                <Link
+                  href={`/blog/${post.id}`}
+                  className="text-red-700 font-medium"
+                >
+                  Read More →
+                </Link>
               </div>
             ))}
           </div>

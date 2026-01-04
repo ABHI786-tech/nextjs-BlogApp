@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { app } from "../lib/auth";
@@ -6,7 +7,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
   getFirestore,
   collection,
-  addDoc,          
+  addDoc,
   serverTimestamp,
 } from "firebase/firestore";
 
@@ -21,7 +22,6 @@ export default function CreatePost() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [image, setImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   // 🔐 Auth Check
@@ -38,6 +38,27 @@ export default function CreatePost() {
     return () => unsubscribe();
   }, [auth, router]);
 
+  // ✍️ Insert text at cursor
+  const insertAtCursor = (text) => {
+    const textarea = document.getElementById("content-editor");
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+
+    const newText =
+      content.substring(0, start) +
+      text +
+      content.substring(end);
+
+    setContent(newText);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd =
+        start + text.length;
+    }, 0);
+  };
 
   // 🚀 Create Blog
   const handleSubmit = async (e) => {
@@ -51,11 +72,9 @@ export default function CreatePost() {
     try {
       setSubmitting(true);
 
-      // 2️⃣ Save blog to Firestore
       await addDoc(collection(db, "posts"), {
         title,
         content,
-        // image: imageUrl,
         author: {
           uid: user.uid,
           email: user.email,
@@ -79,40 +98,65 @@ export default function CreatePost() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-26">
-      <h1 className="text-3xl font-bold mb-6">Create Blog Post</h1>
+    <div className="max-w-3xl mx-auto px-4 py-24">
+      <h1 className="text-3xl font-bold mb-6">
+        Create Blog Post
+      </h1>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Title */}
+        {/* 📝 Title */}
         <input
           type="text"
           placeholder="Blog Title"
-          className="w-full border rounded-lg p-3"
+          className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-600"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
 
-        {/* Image */}
-        {/* <div>
-          <label className="block font-semibold mb-2">Blog Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files[0])}
-            className="w-full border rounded-lg p-2"
-          />
-        </div> */}
-
-        {/* Content */}
+        {/* ✍️ Content */}
         <textarea
-          rows={8}
+          id="content-editor"
+          rows={10}
           placeholder="Write blog content..."
-          className="w-full border rounded-lg p-3"
+          className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-red-600"
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
 
-        {/* Meta */}
+        {/* ➕ INSERT OPTIONS */}
+        {/* <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() =>
+              insertAtCursor("\n[Link] https://example.com\n")
+            }
+            className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100"
+          >
+            🔗 Add Link
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              insertAtCursor("\n[Video] https://youtube.com/\n")
+            }
+            className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100"
+          >
+            🎥 Add Video
+          </button>
+
+          <button
+            type="button"
+            onClick={() =>
+              insertAtCursor("\n[Document] https://drive.google.com/\n")
+            }
+            className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-100"
+          >
+            📄 Add Document
+          </button>
+        </div> */}
+
+        {/* ℹ️ Meta Info */}
         <div className="text-sm text-gray-500">
           <p>
             <b>Created by:</b> {user?.email}
@@ -122,6 +166,7 @@ export default function CreatePost() {
           </p>
         </div>
 
+        {/* 🚀 Submit */}
         <button
           type="submit"
           disabled={submitting}

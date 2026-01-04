@@ -18,6 +18,7 @@ import { Pencil, Trash2 } from "lucide-react";
 export default function MyBlogsPage() {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
+  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   // 🔐 Auth Listener
@@ -76,6 +77,13 @@ export default function MyBlogsPage() {
     }
   };
 
+  // 🔍 SEARCH FILTER
+  const filteredBlogs = blogs.filter(
+    (blog) =>
+      blog.title?.toLowerCase().includes(search.toLowerCase()) ||
+      blog.description?.toLowerCase().includes(search.toLowerCase())
+  );
+
   // 🔄 Loading UI
   if (loading) {
     return (
@@ -109,8 +117,9 @@ export default function MyBlogsPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-24">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-12">
+
+        {/* HEADER + SEARCH */}
+        <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">
               My Blogs
@@ -120,34 +129,39 @@ export default function MyBlogsPage() {
             </p>
           </div>
 
-          <Link
-            href="/create-blog"
-            className="bg-[var(--button-color)] text-white px-5 py-3 rounded-lg font-medium hover:bg-red-800 transition"
-          >
-            + New Blog
-          </Link>
-        </div>
+          <div className="flex gap-3 w-full sm:w-auto">
+            {/* 🔍 SEARCH */}
+            
+            <input
+              type="text"
+              placeholder="Search your blogs..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full sm:w-64 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
+            />
 
-        {/* Empty State */}
-        {blogs.length === 0 ? (
-          <div className="text-center py-24">
-            <h3 className="text-xl font-semibold mb-2">
-              No blogs yet
-            </h3>
-            <p className="text-gray-500 mb-6">
-              Start writing your first blog 🚀
-            </p>
             <Link
               href="/create-blog"
-              className="inline-block bg-[var(--button-color)] text-white px-6 py-3 rounded-lg hover:bg-red-800 transition"
+              className="bg-[var(--button-color)] text-white px-5 py-2 rounded-lg font-medium hover:bg-red-800 transition whitespace-nowrap"
             >
-              Create Blog
+              + New Blog
             </Link>
           </div>
+        </div>
+
+        {/* EMPTY / LIST */}
+        {filteredBlogs.length === 0 ? (
+          <div className="text-center py-24">
+            <h3 className="text-xl font-semibold mb-2">
+              No blogs found
+            </h3>
+            <p className="text-gray-500 mb-6">
+              Try a different keyword 🔍
+            </p>
+          </div>
         ) : (
-          /* Blog Cards */
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {blogs.map((blog) => (
+            {filteredBlogs.map((blog) => (
               <div
                 key={blog.id}
                 className="group bg-white rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative"
@@ -171,7 +185,6 @@ export default function MyBlogsPage() {
 
                     {/* ACTION BUTTONS */}
                     <div className="flex items-center gap-4">
-                      {/* Edit */}
                       <Link
                         href={`/editblog/${blog.id}`}
                         className="text-gray-500 hover:text-blue-600 transition"
@@ -180,7 +193,6 @@ export default function MyBlogsPage() {
                         <Pencil size={18} />
                       </Link>
 
-                      {/* Delete */}
                       <button
                         onClick={() => handleDelete(blog.id)}
                         className="text-gray-500 hover:text-red-600 transition"
@@ -189,10 +201,9 @@ export default function MyBlogsPage() {
                         <Trash2 size={18} />
                       </button>
 
-                      {/* Read */}
                       <Link
                         href={`/blog/${blog.id}`}
-                        className="text-red-600 font-medium flex items-center gap-1 hover:underline"
+                        className="text-red-600 font-medium hover:underline"
                       >
                         Read →
                       </Link>
