@@ -7,6 +7,8 @@ import {
 import { auth } from "../../lib/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
+
 
 const Login = () => {
   const router = useRouter();
@@ -117,12 +119,13 @@ const Login = () => {
       </div>
 
       {/* Right Side - Image */}
-      <div className="flex-1 hidden md:flex items-center justify-center bg-blue-100">
-        <img
-          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
-          alt="Login Illustration"  
-          className="object-cover h-full w-full rounded-l-lg opacity-70"
-          loading="eager"
+      <div className="flex-1 hidden md:block relative min-h-screen">
+        <Image
+          src="/images/login.jpg"
+          alt="login Illustration"
+          fill
+          className="object-fit opacity-80"
+          priority
         />
       </div>
     </div>

@@ -15,6 +15,8 @@ import { auth, db } from "../lib/auth";
 import Link from "next/link";
 import { Pencil, Trash2 } from "lucide-react";
 
+import { Searchbar, FilterPosts } from "../components/searchbar";
+
 export default function MyBlogsPage() {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -77,12 +79,8 @@ export default function MyBlogsPage() {
     }
   };
 
-  // 🔍 SEARCH FILTER
-  const filteredBlogs = blogs.filter(
-    (blog) =>
-      blog.title?.toLowerCase().includes(search.toLowerCase()) ||
-      blog.description?.toLowerCase().includes(search.toLowerCase())
-  );
+  // 🔍 SEARCH FILTER (same as AllBlogs)
+  const filteredBlogs = FilterPosts(blogs, search);
 
   // 🔄 Loading UI
   if (loading) {
@@ -129,15 +127,11 @@ export default function MyBlogsPage() {
             </p>
           </div>
 
-          <div className="flex gap-3 w-full sm:w-auto">
-            {/* 🔍 SEARCH */}
-            
-            <input
-              type="text"
-              placeholder="Search your blogs..."
+          <div className="flex gap-3 w-full sm:w-auto items-center">
+            {/* 🔍 SEARCHBAR */}
+            <Searchbar
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full sm:w-64 rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-600"
             />
 
             <Link
@@ -166,7 +160,6 @@ export default function MyBlogsPage() {
                 key={blog.id}
                 className="group bg-white rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative"
               >
-                {/* Accent Line */}
                 <div className="absolute top-0 inset-x-0 h-1 bg-[var(--button-color)] scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
 
                 <div className="p-6">
@@ -183,12 +176,10 @@ export default function MyBlogsPage() {
                       {blog.author?.email}
                     </span>
 
-                    {/* ACTION BUTTONS */}
                     <div className="flex items-center gap-4">
                       <Link
                         href={`/editblog/${blog.id}`}
                         className="text-gray-500 hover:text-blue-600 transition"
-                        title="Edit Blog"
                       >
                         <Pencil size={18} />
                       </Link>
@@ -196,7 +187,6 @@ export default function MyBlogsPage() {
                       <button
                         onClick={() => handleDelete(blog.id)}
                         className="text-gray-500 hover:text-red-600 transition"
-                        title="Delete Blog"
                       >
                         <Trash2 size={18} />
                       </button>
@@ -214,6 +204,7 @@ export default function MyBlogsPage() {
             ))}
           </div>
         )}
+
       </div>
     </div>
   );

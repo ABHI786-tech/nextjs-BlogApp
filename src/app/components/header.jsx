@@ -9,15 +9,14 @@ import { getAvatarColor } from "../lib/avtarColor"; // ✅ added
 
 export default function Header() {
   const pathname = usePathname();
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [openDesktopProfile, setOpenDesktopProfile] = useState(false);
   const [openMobileProfile, setOpenMobileProfile] = useState(false);
-
   const desktopProfileRef = useRef(null);
   const mobileProfileRef = useRef(null);
 
+  // console.log(pathname, "pathname")
   const navItems = [
     { name: "Home", href: "/" },
     { name: "About", href: "/about" },

@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "../../lib/auth";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 const Register = () => {
   const router = useRouter();
@@ -138,11 +139,13 @@ const Register = () => {
       </div>
 
       {/* Right Side - Image */}
-      <div className="flex-1 hidden md:flex items-center justify-center bg-blue-100 h-full">
-        <img
-          src="https://images.unsplash.com/photo-1766767673683-168676b97f4c?q=80&w=387&auto=format&fit=crop"
+      <div className="flex-1 hidden md:block relative min-h-screen">
+        <Image
+          src="/images/register.jpg"
           alt="Register Illustration"
-          className="object-cover max-h-screen w-full rounded-l-lg opacity-70"
+          fill
+          className="object-fit opacity-80"
+          priority
         />
       </div>
     </div>
