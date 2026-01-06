@@ -1,6 +1,6 @@
 import "./globals.css";
 import Header from "./components/header";
-import Footer from "@/app/components/footer"
+import Footer from "./components/footer"
 import Chatbot from "@/app/components/chatbot"
 
 export default function RootLayout({ children }) {
