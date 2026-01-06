@@ -1,6 +1,7 @@
 import "./globals.css";
 import Header from "./components/header";
-import Footer from "@/app/components/Footer"
+import Footer from "@/app/components/footer"
+import Chatbot from "@/app/components/chatbot"
 
 export default function RootLayout({ children }) {
   return (
@@ -14,6 +15,7 @@ export default function RootLayout({ children }) {
         <main>
           {children}
         </main>
+          <Chatbot />
 
         <Footer />
 

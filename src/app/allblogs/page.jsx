@@ -13,7 +13,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
-import Pagination from "../components/Pagination";
+import Pagination from "../components/pagination";
 import { Searchbar, FilterPosts } from "../components/searchbar";
 
 import { DateRange } from "react-date-range";
