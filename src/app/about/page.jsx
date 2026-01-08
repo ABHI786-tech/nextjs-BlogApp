@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import React from "react";
 
 const About = () => {
@@ -72,12 +73,12 @@ const About = () => {
           <p className="text-gray-600 mb-6">
             Read our blogs, share your thoughts, and grow with us.
           </p>
-          <a
-            href="/blogs"
+          <Link
+            href="/allblogs"
             className="inline-block bg-[var(--button-color)] text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-800 transition"
           >
             Explore Blogs
-          </a>
+          </Link>
         </div>
       </section>
     </div>
