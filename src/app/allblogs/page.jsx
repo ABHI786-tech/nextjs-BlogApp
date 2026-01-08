@@ -1,22 +1,26 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
+import {
+  collection,
+  getFirestore,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
+
 import { app } from "../lib/auth";
 import { Searchbar, FilterPosts } from "../components/searchbar";
 import Pagination from "../components/pagination";
-import {
-  getFirestore,
-  collection,
-  query,
-  orderBy,
-  onSnapshot,
-} from "firebase/firestore";
+
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
+
+const BLOGS_PER_PAGE = 12;
 
 export default function AllBlogs() {
   const db = getFirestore(app);
@@ -25,19 +29,16 @@ export default function AllBlogs() {
   const [search, setSearch] = useState("");
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-
-  const blogsPerPage = 6;
-
   const [dateRange, setDateRange] = useState([
     { startDate: null, endDate: null, key: "selection" },
   ]);
 
   const { startDate, endDate } = dateRange[0];
 
-  /* 🔥 Fetch blogs */
+  /* Fetch Blogs */
   useEffect(() => {
     const q = query(collection(db, "posts"), orderBy("createdAt", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    return onSnapshot(q, (snapshot) => {
       setPosts(
         snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -45,30 +46,31 @@ export default function AllBlogs() {
         }))
       );
     });
-
-    return unsubscribe;
   }, [db]);
 
-  /* 🔍 Search + Date Filter */
+  /* Search + Date Filter */
   const filteredBlogs = useMemo(() => {
     let blogs = FilterPosts(posts, search);
 
-    if (startDate && endDate) {
-      blogs = blogs.filter((blog) => {
-        if (!blog.createdAt?.seconds) return false;
-        const blogDate = new Date(blog.createdAt.seconds * 1000);
-        return blogDate >= startDate && blogDate <= endDate;
-      });
-    }
+    if (!startDate || !endDate) return blogs;
 
-    return blogs;
+    return blogs.filter((blog) => {
+      if (!blog.createdAt?.seconds) return false;
+      const date = new Date(blog.createdAt.seconds * 1000);
+      return date >= startDate && date <= endDate;
+    });
   }, [posts, search, startDate, endDate]);
 
-  /* 📄 Pagination */
-  const totalPages = Math.ceil(filteredBlogs.length / blogsPerPage);
-  const currentBlogs = filteredBlogs.slice(
-    (currentPage - 1) * blogsPerPage,
-    currentPage * blogsPerPage
+  /* Pagination */
+  const totalPages = Math.ceil(filteredBlogs.length / BLOGS_PER_PAGE);
+
+  const currentBlogs = useMemo(
+    () =>
+      filteredBlogs.slice(
+        (currentPage - 1) * BLOGS_PER_PAGE,
+        currentPage * BLOGS_PER_PAGE
+      ),
+    [filteredBlogs, currentPage]
   );
 
   useEffect(() => {
@@ -78,7 +80,6 @@ export default function AllBlogs() {
   return (
     <div className="min-h-screen bg-gray-50 py-24 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <header className="mb-10">
           <h1 className="text-4xl font-bold text-gray-900">All Blogs</h1>
           <p className="text-gray-500 mt-1">
@@ -86,15 +87,11 @@ export default function AllBlogs() {
           </p>
         </header>
 
-        {/* Filters */}
         <div className="mb-6 flex items-center gap-3">
-          <Searchbar
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+          <Searchbar value={search} onChange={(e) => setSearch(e.target.value)} />
 
           <button
-            onClick={() => setShowDateFilter((prev) => !prev)}
+            onClick={() => setShowDateFilter((v) => !v)}
             className="border rounded-lg px-3 py-2 flex items-center gap-1"
           >
             <Calendar size={18} />
@@ -109,7 +106,6 @@ export default function AllBlogs() {
           </button>
         </div>
 
-        {/* Date Picker */}
         {showDateFilter && (
           <div className="mb-6 bg-white rounded-xl shadow p-4 w-fit">
             <DateRange
@@ -133,15 +129,14 @@ export default function AllBlogs() {
           </div>
         )}
 
-        {/* Blog List */}
         {currentBlogs.length === 0 ? (
-          <p className="text-gray-500 text-center">No blogs found</p>
+          <p className="text-center text-gray-500">No blogs found</p>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {currentBlogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition p-6"
+                className="bg-white rounded-2xl shadow-lg transition hover:-translate-y-2 hover:shadow-2xl p-6"
               >
                 <h2 className="text-xl font-semibold mb-3 line-clamp-2">
                   {blog.title}
@@ -173,7 +168,6 @@ export default function AllBlogs() {
           </div>
         )}
 
-        {/* Pagination */}
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
