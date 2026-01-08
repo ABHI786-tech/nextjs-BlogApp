@@ -1,7 +1,7 @@
 import "./globals.css";
 import Header from "./components/header";
 import Footer from "./components/footer"
-import Chatbot from "@/app/components/chatbot"
+import Chatbot from "./components/chatbot"
 
 export default function RootLayout({ children }) {
   return (
