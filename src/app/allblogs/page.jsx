@@ -15,7 +15,7 @@ import {
 
 import { app } from "../lib/auth";
 import { Searchbar, FilterPosts } from "../components/searchbar";
-import Pagination from "../components/pagination";
+import Pagination from "../components/Pagination";
 
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
