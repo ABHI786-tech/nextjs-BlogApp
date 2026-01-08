@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
-import Pagination from "../components/pagination";
 import { app } from "../lib/auth";
 import { Searchbar, FilterPosts } from "../components/searchbar";
+import Pagination from "../components/pagination";
 import {
   getFirestore,
   collection,
