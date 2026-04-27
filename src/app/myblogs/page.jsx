@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
+import Image from "next/image";
 import {
   collection,
   query,
@@ -13,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../lib/auth";
 import Link from "next/link";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, ArrowRight } from "lucide-react";
 
 import { Searchbar, FilterPosts } from "../components/searchbar";
 
@@ -154,50 +155,80 @@ export default function MyBlogsPage() {
             </p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredBlogs.map((blog) => (
               <div
                 key={blog.id}
-                className="group bg-white rounded-2xl border border-gray-200 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative"
+                className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(220,38,38,0.15)] hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="absolute top-0 inset-x-0 h-1 bg-[var(--button-color)] scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-                    {blog.title}
-                  </h2>
-
-                  <p className="text-gray-500 text-sm mb-6 line-clamp-3">
-                    {blog.description}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-400 truncate max-w-[60%]">
-                      {blog.author?.email}
-                    </span>
-
-                    <div className="flex items-center gap-4">
+                {/* Cover Image */}
+                {blog.imageUrl ? (
+                  <div className="relative w-full h-56 overflow-hidden">
+                    <Image
+                      src={blog.imageUrl}
+                      alt={blog.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    {/* Edit/Delete overlay buttons */}
+                    <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <Link
                         href={`/editblog/${blog.id}`}
-                        className="text-gray-500 hover:text-blue-600 transition"
+                        className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-600 hover:text-blue-600 shadow transition"
                       >
-                        <Pencil size={18} />
+                        <Pencil size={14} />
                       </Link>
-
                       <button
                         onClick={() => handleDelete(blog.id)}
-                        className="text-gray-500 hover:text-red-600 transition"
+                        className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-600 hover:text-red-600 shadow transition"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={14} />
                       </button>
-
-                      <Link
-                        href={`/blog/${blog.id}`}
-                        className="text-red-600 font-medium hover:underline"
-                      >
-                        Read →
-                      </Link>
                     </div>
+                  </div>
+                ) : (
+                  <div className="relative w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 font-medium">No Image</span>
+                    {/* Edit/Delete for no-image cards */}
+                    <div className="absolute top-3 right-3 flex gap-2">
+                      <Link
+                        href={`/editblog/${blog.id}`}
+                        className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-600 hover:text-blue-600 shadow transition"
+                      >
+                        <Pencil size={14} />
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(blog.id)}
+                        className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-600 hover:text-red-600 shadow transition"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-col flex-grow p-6">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-red-700 uppercase bg-red-50 rounded-full mb-3 w-fit">
+                    Article
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors">
+                    {blog.title}
+                  </h2>
+                  <p className="text-gray-500 text-sm mb-5 line-clamp-3 leading-relaxed">
+                    {blog.description || blog.content}
+                  </p>
+
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <span className="text-xs text-gray-400 truncate max-w-[60%]">
+                      {blog.author?.email?.split("@")[0]}
+                    </span>
+                    <Link
+                      href={`/blog/${blog.id}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      Read <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
                   </div>
                 </div>
               </div>

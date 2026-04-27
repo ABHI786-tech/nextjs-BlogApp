@@ -151,7 +151,7 @@ export default function Home() {
             className="relative w-[130%] md:w-[100%] h-[70vh] md:h-[90vh] max-w-5xl"
           >
             {/* <Image
-              src="/hero_image.png"
+              src="/images/man_reading_newspaer.ico"
               alt="Person reading newspaper 3D"
               fill
               className="object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"

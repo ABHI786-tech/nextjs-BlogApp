@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Calendar } from "lucide-react";
+import Image from "next/image";
+import { Calendar, ArrowRight } from "lucide-react";
 import { DateRange } from "react-date-range";
 import { format } from "date-fns";
 import {
@@ -130,39 +131,59 @@ export default function AllBlogs() {
         )}
 
         {currentBlogs.length === 0 ? (
-          <p className="text-center text-gray-500">No blogs found</p>
+          <p className="text-center text-gray-500 py-20">No blogs found</p>
         ) : (
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {currentBlogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-white rounded-2xl shadow-lg transition hover:-translate-y-2 hover:shadow-2xl p-6"
+                className="group flex flex-col bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(220,38,38,0.15)] hover:-translate-y-1 transition-all duration-300"
               >
-                <h2 className="text-xl font-semibold mb-3 line-clamp-2">
-                  {blog.title}
-                </h2>
+                {/* Cover Image */}
+                {blog.imageUrl ? (
+                  <div className="relative w-full h-56 overflow-hidden">
+                    <Image
+                      src={blog.imageUrl}
+                      alt={blog.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-gray-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                ) : (
+                  <div className="relative w-full h-56 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <span className="text-gray-400 font-medium">No Image</span>
+                  </div>
+                )}
 
-                <p className="text-gray-600 mb-4 line-clamp-3">
-                  {blog.content}
-                </p>
+                <div className="flex flex-col flex-grow p-6">
+                  <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider text-red-700 uppercase bg-red-50 rounded-full mb-3 w-fit">
+                    Article
+                  </span>
+                  <h2 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight group-hover:text-red-600 transition-colors">
+                    {blog.title}
+                  </h2>
+                  <p className="text-gray-500 text-sm mb-5 line-clamp-3 leading-relaxed">
+                    {blog.content}
+                  </p>
 
-                <div className="text-sm text-gray-500 mb-4">
-                  <p>By {blog.author?.email}</p>
-                  {blog.createdAt?.seconds && (
-                    <p>
-                      {new Date(
-                        blog.createdAt.seconds * 1000
-                      ).toLocaleDateString()}
-                    </p>
-                  )}
+                  <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 truncate max-w-[130px]">{blog.author?.email?.split("@")[0]}</p>
+                      {blog.createdAt?.seconds && (
+                        <p className="text-xs text-gray-400">
+                          {new Date(blog.createdAt.seconds * 1000).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                    <Link
+                      href={`/blog/${blog.id}`}
+                      className="inline-flex items-center gap-1.5 text-sm font-bold text-red-600 hover:text-red-800 transition-colors"
+                    >
+                      Read <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  </div>
                 </div>
-
-                <Link
-                  href={`/blog/${blog.id}`}
-                  className="text-red-700 font-medium hover:underline"
-                >
-                  Read More →
-                </Link>
               </div>
             ))}
           </div>

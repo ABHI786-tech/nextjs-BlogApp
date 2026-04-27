@@ -56,32 +56,140 @@ export default function ViewBlog() {
       collection(db, "posts", id, "comments"),
       orderBy("createdAt", "desc")
     );
-
     const unsub = onSnapshot(q, (snapshot) => {
       setComments(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
       );
     });
-
     return () => unsub();
   }, [db, id]);
 
   // ➕ Add comment
   const handleComment = async () => {
     if (!commentText.trim()) return;
-
     await addDoc(collection(db, "posts", id, "comments"), {
       text: commentText,
       userEmail: user.email,
       userId: user.uid,
       createdAt: serverTimestamp(),
     });
-
     setCommentText("");
   };
+
+  // -------------------------------------------------------
+  // 🖼️ Smart Content Renderer
+  // Detects image / video / YouTube URLs anywhere in content
+  // and renders them as actual media — not as links.
+  // -------------------------------------------------------
+  const renderContent = (content) => {
+    if (!content) return null;
+
+    // Split on URLs while keeping the URL in the result array
+    const URL_SPLIT = /(https?:\/\/[^\s]+)/g;
+
+    const isYouTube = (url) =>
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/.test(url);
+
+    const getYouTubeId = (url) => {
+      const m = url.match(
+        /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]+)/
+      );
+      return m ? m[1] : null;
+    };
+
+    const isImage = (url) =>
+      /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)(\?.*)?$/i.test(url) ||
+      /firebasestorage\.googleapis\.com.*\.(jpg|jpeg|png|gif|webp|svg)/i.test(url);
+
+    const isVideo = (url) =>
+      /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(url) ||
+      /firebasestorage\.googleapis\.com.*\.(mp4|webm|ogg|mov)/i.test(url);
+
+    // Renders a single URL as media or a plain link
+    const renderUrl = (url, key) => {
+      if (isYouTube(url)) {
+        return (
+          <div key={key} className="my-6 rounded-2xl overflow-hidden shadow-lg w-full aspect-video">
+            <iframe
+              src={`https://www.youtube.com/embed/${getYouTubeId(url)}`}
+              title="YouTube video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+        );
+      }
+      if (isVideo(url)) {
+        return (
+          <div key={key} className="my-6 rounded-2xl overflow-hidden shadow-lg">
+            <video
+              src={url}
+              controls
+              className="w-full rounded-2xl max-h-[500px] object-contain bg-black"
+            />
+          </div>
+        );
+      }
+      if (isImage(url)) {
+        return (
+          <div key={key} className="my-6 rounded-2xl overflow-hidden shadow-md">
+            <img
+              src={url}
+              alt="Blog media"
+              className="w-full object-contain rounded-2xl max-h-[500px]"
+            />
+          </div>
+        );
+      }
+      // Non-media URL → clickable link
+      return (
+        <a
+          key={key}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-red-600 underline underline-offset-2 hover:text-red-800 break-all"
+        >
+          {url}
+        </a>
+      );
+    };
+
+    const lines = content.split("\n");
+
+    return lines.map((line, lineIdx) => {
+      const trimmed = line.trim();
+
+      // Empty line → spacer
+      if (!trimmed) return <div key={lineIdx} className="h-4" />;
+
+      // Split line into [text, url, text, url, ...] parts
+      const parts = trimmed.split(URL_SPLIT);
+
+      // Entire line is a single URL → block-level media
+      if (parts.length === 3 && parts[0] === "" && parts[2] === "") {
+        return (
+          <div key={lineIdx}>
+            {renderUrl(parts[1], `${lineIdx}-0`)}
+          </div>
+        );
+      }
+
+      // Mixed line: inline text + media/links
+      return (
+        <p key={lineIdx} className="mb-4 text-lg md:text-xl font-medium text-gray-800 leading-relaxed">
+          {parts.map((part, i) =>
+            /^https?:\/\//.test(part)
+              ? renderUrl(part, `${lineIdx}-${i}`)
+              : part
+          )}
+        </p>
+      );
+    });
+  };
+
+  // -------------------------------------------------------
 
   if (loading) {
     return (
@@ -101,9 +209,9 @@ export default function ViewBlog() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 py-16 px-4 sm:px-6">
+    <div className="min-h-screen bg-gray-50/50 py-24 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto">
-        
+
         {/* 🔙 BACK */}
         <Link
           href="/"
@@ -114,7 +222,7 @@ export default function ViewBlog() {
         </Link>
 
         {/* 📝 BLOG CARD */}
-        <motion.article 
+        <motion.article
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -130,7 +238,7 @@ export default function ViewBlog() {
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent" />
-              
+
               <div className="absolute bottom-0 left-0 w-full p-8 sm:p-12 text-white">
                 <span className="inline-block px-4 py-1.5 text-xs font-bold tracking-widest text-white uppercase bg-red-600 rounded-full mb-6 shadow-lg shadow-red-600/30">
                   Article
@@ -138,17 +246,17 @@ export default function ViewBlog() {
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 leading-tight drop-shadow-md">
                   {post.title}
                 </h1>
-                
+
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white font-bold text-lg border border-white/30">
                     {post.author?.email?.charAt(0).toUpperCase() || "A"}
                   </div>
                   <div>
                     <p className="font-semibold text-white/90">
-                      {post.author?.email?.split('@')[0] || post.author?.email}
+                      {post.author?.email?.split("@")[0] || post.author?.email}
                     </p>
                     <p className="text-sm text-white/60">
-                      {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}
+                      {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                     </p>
                   </div>
                 </div>
@@ -170,25 +278,24 @@ export default function ViewBlog() {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">
-                    {post.author?.email?.split('@')[0] || post.author?.email}
+                    {post.author?.email?.split("@")[0] || post.author?.email}
                   </p>
                   <p className="text-sm text-gray-500">
-                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric'})}
+                    {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
                   </p>
                 </div>
               </div>
             </div>
           )}
 
-          <div className="p-8 sm:p-12 pt-8 prose prose-lg md:prose-xl max-w-none prose-gray leading-relaxed text-gray-700">
-            <p className="whitespace-pre-line text-lg md:text-xl font-medium text-gray-800 leading-relaxed">
-              {post.content}
-            </p>
+          {/* 📄 Blog Content */}
+          <div className="p-8 sm:p-12 pt-8 max-w-none leading-relaxed text-gray-700">
+            {renderContent(post.content)}
           </div>
         </motion.article>
 
         {/* 💬 COMMENTS */}
-        <motion.section 
+        <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
@@ -263,15 +370,15 @@ export default function ViewBlog() {
                   <div className="flex-grow bg-gray-50/80 rounded-2xl p-5 border border-gray-100 shadow-sm group-hover:bg-white group-hover:shadow-md transition-all">
                     <div className="flex items-center justify-between mb-2">
                       <p className="font-bold text-gray-900">
-                        {comment.userEmail?.split('@')[0]}
+                        {comment.userEmail?.split("@")[0]}
                       </p>
                       <span className="text-xs font-medium text-gray-400">
-                        {comment.createdAt ? new Date(comment.createdAt.toDate()).toLocaleDateString() : 'Just now'}
+                        {comment.createdAt
+                          ? new Date(comment.createdAt.toDate()).toLocaleDateString()
+                          : "Just now"}
                       </span>
                     </div>
-                    <p className="text-gray-700 leading-relaxed">
-                      {comment.text}
-                    </p>
+                    <p className="text-gray-700 leading-relaxed">{comment.text}</p>
                   </div>
                 </motion.div>
               ))}
