@@ -31,7 +31,7 @@ export default function Home() {
   const PAGE_SIZE = 6;
 
   // 🔥 Fetch Posts (Firestore Pagination)
-  const fetchPosts = async () => {
+  const fetchPosts = React.useCallback(async () => {
     if (loading || !hasMore) return;
 
     setLoading(true);
@@ -82,12 +82,12 @@ export default function Home() {
     }
 
     setLoading(false);
-  };
+  }, [db, hasMore, lastDoc, loading]);
 
   // 🚀 Initial Load
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
 
   // 👇 Infinite Scroll
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function Home() {
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, loading, lastDoc]);
+  }, [hasMore, loading, fetchPosts]);
 
   // 🔍 Search Filter
   const filteredPosts = FilterPosts(posts, search);
@@ -208,7 +208,7 @@ export default function Home() {
               <Search className="w-10 h-10 text-gray-400" />
             </div>
             <h4 className="text-xl font-semibold text-gray-900 mb-2">No posts found</h4>
-            <p className="text-gray-500">We couldn't find anything matching your search.</p>
+            <p className="text-gray-500">We couldn&apos;t find anything matching your search.</p>
           </div>
         ) : (
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -283,7 +283,7 @@ export default function Home() {
         {!hasMore && posts.length > 0 && (
           <div className="text-center mt-16">
             <span className="inline-block px-4 py-2 bg-gray-100 text-gray-500 rounded-full text-sm font-medium">
-              You've reached the end! 🏁
+              You&apos;ve reached the end! 🏁
             </span>
           </div>
         )}

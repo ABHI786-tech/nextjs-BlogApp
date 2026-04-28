@@ -79,6 +79,13 @@ export default function Header() {
   );
 
   return (
+    <>
+    <style>{`
+      @keyframes dropdownFadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+    `}</style>
     <nav className="fixed top-3 left-5 right-5 z-50 bg-gray-400/50 backdrop-blur-lg rounded-4xl shadow-lg">
       <div className="max-w-screen mx-auto px-6 py-4 flex items-center justify-between">
 
@@ -126,25 +133,67 @@ export default function Header() {
               </button>
 
               {openDesktopProfile && (
-                <div className="absolute right-0 mt-3 w-48 rounded-md text-white bg-gray-800 shadow-lg">
-                  <div className="px-4 py-2 text-sm border-b">
-                    {user.email}
+                <div
+                  className="absolute right-0 mt-3 w-64 rounded-2xl overflow-hidden shadow-2xl"
+                  style={{
+                    background: "rgba(15, 15, 25, 0.85)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    animation: "dropdownFadeIn 0.2s ease forwards",
+                  }}
+                >
+                  {/* User Info Header */}
+                  <div className="px-4 py-4 flex items-center gap-3"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+                  >
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center font-bold text-white text-base flex-shrink-0 ${avatarColor}`}>
+                      {userInitial}
+                    </div>
+                    <div className="overflow-hidden">
+                      <p className="text-xs font-semibold text-white/90 truncate">
+                        {user.displayName || "User"}
+                      </p>
+                      <p className="text-[11px] text-white/50 truncate">{user.email}</p>
+                    </div>
                   </div>
 
-                  <Link
-                    href="/profile"
-                    onClick={() => setOpenDesktopProfile(false)}
-                    className="block px-4 py-2 text-sm hover:bg-white/5"
-                  >
-                    Your Profile
-                  </Link>
+                  {/* Menu Items */}
+                  <div className="py-2 px-2">
+                    <Link
+                      href="/profile"
+                      onClick={() => setOpenDesktopProfile(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/80 hover:text-white hover:bg-white/8 transition-all duration-150"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <span style={{ fontSize: "16px" }}>👤</span>
+                      <span>Your Profile</span>
+                    </Link>
 
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-white/5"
-                  >
-                    Sign out
-                  </button>
+                    <Link
+                      href="/myblogs"
+                      onClick={() => setOpenDesktopProfile(false)}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/80 hover:text-white hover:bg-white/8 transition-all duration-150"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <span style={{ fontSize: "16px" }}>📝</span>
+                      <span>My Blogs</span>
+                    </Link>
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ height: "1px", background: "rgba(255,255,255,0.08)", margin: "0 12px" }} />
+
+                  {/* Sign Out */}
+                  <div className="py-2 px-2">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all duration-150"
+                    >
+                      <span style={{ fontSize: "16px" }}>🚪</span>
+                      <span>Sign out</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </li>
@@ -182,16 +231,35 @@ export default function Header() {
               </button>
 
               {openMobileProfile && (
-                <Link
-                  href="/profile"
-                  onClick={() => {
-                    setOpenMobileProfile(false);
-                    setIsMobileMenuOpen(false);
+                <div
+                  className="mt-3 rounded-2xl overflow-hidden"
+                  style={{
+                    background: "rgba(15, 15, 25, 0.9)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    animation: "dropdownFadeIn 0.2s ease forwards",
                   }}
-                  className="block mt-3 pl-11 text-sm hover:text-gray-300"
                 >
-                  Your Profile
-                </Link>
+                  <div className="py-1 px-2">
+                    <Link
+                      href="/profile"
+                      onClick={() => { setOpenMobileProfile(false); setIsMobileMenuOpen(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/80 hover:text-white hover:bg-white/8 transition-all duration-150"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <span style={{ fontSize: "15px" }}>👤</span>
+                      <span>Your Profile</span>
+                    </Link>
+                    <Link
+                      href="/myblogs"
+                      onClick={() => { setOpenMobileProfile(false); setIsMobileMenuOpen(false); }}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/80 hover:text-white hover:bg-white/8 transition-all duration-150"
+                      style={{ textDecoration: "none" }}
+                    >
+                      <span style={{ fontSize: "15px" }}>📝</span>
+                      <span>My Blogs</span>
+                    </Link>
+                  </div>
+                </div>
               )}
             </li>
           )}
@@ -221,5 +289,6 @@ export default function Header() {
         </ul>
       </div>
     </nav>
+    </>
   );
 }

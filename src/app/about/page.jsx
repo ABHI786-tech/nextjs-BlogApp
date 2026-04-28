@@ -6,9 +6,11 @@ const About = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-5">
       {/* Hero Section */}
-      <section className="bg-red-900/90 text-white py-20">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">
+      {/* <section className="bg-[#050000] text-white py-20 h-[50vh]"> */}
+      <section className="relative w-full h-[55vh] border-b-[2px] sm:border-b-[3px] border-[#ff3535]  overflow-hidden flex flex-col bg-[#050000] shadow-[0_0_50px_rgba(255,0,0,0.15)] mb-12">
+
+        <div className="max-w-5xl mx-auto px-6 text-center mt-[22vh]">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-gray-300 ">
             About Our Blog
           </h1>
           <p className="text-lg md:text-xl text-red-100">
