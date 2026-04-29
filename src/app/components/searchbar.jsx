@@ -18,7 +18,7 @@ export const Searchbar = ({value, onChange}) => {
       value={value}
       onChange={onChange}
       placeholder="Search posts..."
-      className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+      className="w-full text-black md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
     />
   </>
   )
